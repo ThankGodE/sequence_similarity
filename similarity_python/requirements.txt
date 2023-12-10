@@ -1,0 +1,5 @@
+python-dotenv>=1.0.0
+biopython>=1.81
+psutil>=5.9.4
+tqdm>=4.66.1
+pathos>=0.3.1
