@@ -68,9 +68,9 @@ workflow() {
     cluster_assembly_ch = CLUSTER_ASSEMBLY(concatenate_assemblies_ch)
 
 
-//     if( params.interrogate_uniprot) {
-//
-//         map_uniprot_id_ch = MAP_UNIPROT_ID(cluster_assembly_ch)
-//     }
+    if( params.interrogate_uniprot) {
+
+        map_uniprot_id_ch = MAP_UNIPROT_ID(cluster_assembly_ch)
+    }
 
 }

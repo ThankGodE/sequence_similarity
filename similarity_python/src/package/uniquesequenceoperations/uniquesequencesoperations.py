@@ -9,7 +9,6 @@ import pandas as pd
 
 from Bio import SeqIO
 
-from package.fileoperations.filehandlers import globally_get_all_files
 from package.lateralprocessing.parallelprocessing import synchronize_processes_pathos
 
 
@@ -31,8 +30,7 @@ class UniqueSequenceOperator:
     def process_unique_sequences(self) -> None:
         """ Processes unique sequences. """
 
-        new_combined_records: dict = UniqueSequenceOperator.__combine_sequence_records(self)
-        # UniqueSequenceOperator.__write_fasta(new_combined_records, self.output_dir)
+        UniqueSequenceOperator.__combine_sequence_records(self)
 
     def __combine_sequence_records(self) -> dict:
         """ Combines sequence records. """
@@ -66,20 +64,11 @@ class UniqueSequenceOperator:
 
         UniqueSequenceOperator.__write_fasta(UniqueSequenceOperator.__join_ids_with_sequences(sequences_and_ids_matched))
 
-        pd.set_option('display.max_rows', 50)
-        pd.set_option('display.width', 100)
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.expand_frame_repr', False)
-        print(hundred_percent_sequence_df, "EEEE")
-        print(reference_query_ids_matched_joined)
-        print(sequences_and_ids_matched)
-
     @classmethod
     def __join_ids_with_sequences(cls, reference_query_ids_matched: list) -> list:
         """ Joins the reference and query ids with the reference and query sequences."""
 
         return ["\n".join(element) for element in reference_query_ids_matched]
-
 
 
     @classmethod
@@ -130,8 +119,6 @@ class UniqueSequenceOperator:
 
                 new_string = ">" + element
                 file_content.write(new_string)
-
-
 
 
 def process_distance(reference_df_query_sequence: tuple) -> pd.DataFrame:
