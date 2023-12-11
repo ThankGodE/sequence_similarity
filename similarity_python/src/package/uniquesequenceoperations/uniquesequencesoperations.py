@@ -42,7 +42,7 @@ class UniqueSequenceOperator:
         query_df: pd.DataFrame = UniqueSequenceOperator.__transform_fasta_to_dataframe(self.query_fasta, "query_id",
                                                                                        "query_sequence")
 
-        records_paired: list = [(reference_df, element) for element in query_df["query_sequence"][:20]]
+        records_paired: list = [(reference_df, element) for element in query_df["query_sequence"]]
 
         similar_records: list = synchronize_processes_pathos(process_distance,
                                                           records_paired, 8)
@@ -62,7 +62,8 @@ class UniqueSequenceOperator:
         sequences_and_ids_matched: list = list(zip(reference_query_ids_matched_joined, hundred_percent_sequence_df[
             "reference_sequence"]))
 
-        UniqueSequenceOperator.__write_fasta(UniqueSequenceOperator.__join_ids_with_sequences(sequences_and_ids_matched))
+        UniqueSequenceOperator.__write_fasta(UniqueSequenceOperator.__join_ids_with_sequences(
+            sequences_and_ids_matched), self.output_dir)
 
     @classmethod
     def __join_ids_with_sequences(cls, reference_query_ids_matched: list) -> list:
@@ -111,13 +112,11 @@ class UniqueSequenceOperator:
 
         path_to_output_file: str = os.path.join(output_dir, "combined_sequences.fasta")
 
-        SeqIO.write(combined_records.values(), path_to_output_file, "fasta")
-
-        with open(path_to_output_file, "r") as file_content:
+        with open(path_to_output_file, "w") as file_content:
 
             for element in combined_records:
 
-                new_string = ">" + element
+                new_string = ">" + element + "\n"
                 file_content.write(new_string)
 
 

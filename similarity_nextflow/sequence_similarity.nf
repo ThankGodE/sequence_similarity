@@ -8,13 +8,11 @@ params.fasta_file_extension = "$params.fasta_file_extension"
 println params.fasta_file_extension
 
 // create channels for fasta files
-fasta_files_ch = Channel.fromPath("${params.path_to_fasta_files}/*${params.fasta_file_extension}", checkIfExists: true, followLinks: true)
+fasta_files_ch = Channel.fromFilePairs("${params.path_to_fasta_files}/*{1,2}*${params.fasta_file_extension}", checkIfExists: true, followLinks: true)
 
 process CONCATENATE_ASSEMBLIES() {
 
     publishDir params.output_directory, mode:'copy'
-    input:
-    path fasta_path
 
     output:
     val "$params.output_directory/assemblies_concatenated.fasta"
@@ -44,6 +42,25 @@ process CLUSTER_ASSEMBLY() {
 
 }
 
+process UNIQUE_SEQUENCES() {
+
+    publishDir params.output_directory, mode:'copy'
+    input:
+    tuple val(file_id), path(protein_files)
+
+    output:
+    val "unique_sequences_completed"
+
+    shell:
+    """
+    pip install -r $params.absolute_path_project_root_dir/similarity_python/requirements.txt
+    python3 $params.absolute_path_project_root_dir/similarity_python/src/main/unique_sequences.py \
+    -o $params.output_directory -i $params.path_to_fasta_files/${protein_files[1]} -w $params.path_to_fasta_files/${protein_files[0]}
+    """
+
+
+}
+
 process MAP_UNIPROT_ID() {
 
     publishDir params.output_directory, mode:'copy'
@@ -64,8 +81,9 @@ process MAP_UNIPROT_ID() {
 
 workflow() {
 
-    concatenate_assemblies_ch = CONCATENATE_ASSEMBLIES(fasta_files_ch.collect())
+    concatenate_assemblies_ch = CONCATENATE_ASSEMBLIES()
     cluster_assembly_ch = CLUSTER_ASSEMBLY(concatenate_assemblies_ch)
+    unique_sequences_ch = UNIQUE_SEQUENCES(fasta_files_ch)
 
 
     if( params.interrogate_uniprot) {
