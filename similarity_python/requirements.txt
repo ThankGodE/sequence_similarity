@@ -3,3 +3,5 @@ biopython>=1.81
 psutil>=5.9.4
 tqdm>=4.66.1
 pathos>=0.3.1
+jellyfish>=1.0.3
+pandas>=1.5.3
